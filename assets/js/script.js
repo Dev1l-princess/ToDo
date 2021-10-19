@@ -3,6 +3,10 @@ const btnAdd = document.querySelector('#todo-add')
 const todoList = document.querySelector('.todo__list')
 const todoRemove = document.querySelectorAll('.todo__remove-button')
 
+fetch('./assets/php/index.php')
+.then(res => res.json())
+.then(res => console.log(res))
+
 btnAdd.addEventListener('click', () => {
   const value = input.value
 
@@ -21,6 +25,12 @@ btnAdd.addEventListener('click', () => {
   todoChecks.forEach(input => 
     input.addEventListener('click', e => completeCheck(e))
   )
+
+
+
+
+
+
 })
 
 function completeCheck(e) {
@@ -37,3 +47,6 @@ todoList.addEventListener('click', e => {
     console.log('check');
   }
 })
+
+
+
