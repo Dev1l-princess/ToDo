@@ -28,7 +28,7 @@
     $id = $_POST['id'];
     $boolean = $_POST['checked'];
     
-    $sql = "UPDATE `todo` SET `checked` = $boolean WHERE id = $id";
+    $sql = "UPDATE `todo` SET `checked` = NOT `checked` WHERE id = $id";
     $result = $link->query($sql);
   }
   else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') 
