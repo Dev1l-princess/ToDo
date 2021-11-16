@@ -11,23 +11,24 @@ btnAdd.addEventListener('click', () => {
 
 fetchTodo()
 
-function completeCheck(e) {
-  const span = e.target.nextElementSibling
-  console.log(span)
-  span.style.textDecoration = 'line-through' 
-}
-
 todoList.addEventListener('click', e => {
   const id = e.target.closest('li')?.dataset.id
   const tag = e.target.tagName
+  const type = e.target.type
   const checked = e.target.checked;
-  if (id && tag === 'INPUT') {
-    checkTodo(id, checked)
+  const todo = e.target.closest('li')
+  if (tag === 'INPUT' && type === 'checkbox') {
+    checkTodo(todo)
   }
 
-  if (id && tag === 'BUTTON') {
+  if (tag === 'BUTTON') {
     e.target.closest('li').remove()
     removeTodo(id)
+  }
+
+  else if (tag === 'SPAN') {
+    const target = e.target
+    replaceOnInput(target)
   }
 })
 
@@ -37,13 +38,9 @@ function fetchTodo() {
     .then(res => {
       todoList.innerHTML = ''
       res?.forEach(todo => {
-        let checked
-        if (todo.checked == 1) {
-          checked="checked"
-        }
         todoList.innerHTML += `
           <li class="todo__item" data-id='${todo.id}'>
-            <input type="checkbox" class="todo__checkbox" ${checked}>
+            <input type="checkbox" ${todo.checked == true ? 'checked' : ''} class="todo__checked">
             <span> ${todo.text} </span>
             <button class="todo__remove-button">X</button>
           </li>
@@ -61,12 +58,17 @@ function sendName(todo) {
   }).then(res => fetchTodo())
 }
 
-function checkTodo(id, checked) {
+function checkTodo(todo) {
+  const id = todo.dataset.id
+  const checked = todo.querySelector('input').checked
+  const text = todo.querySelector('span').textContent
+
   fetch('./assets/php/todo.php', {
     method: 'PUT',
     body: JSON.stringify({
       id: id,
-      checked: checked
+      checked: checked,
+      text: text
     })
   })
 }
@@ -81,3 +83,22 @@ function removeTodo(id) {
 }
 
 
+
+function replaceOnInput(target) {
+  const todo = target.closest('li')
+  const input = document.createElement('input')
+  input.value = target.textContent
+  target.replaceWith(input)
+  input.focus()
+  input.addEventListener('blur', () => {
+    replaceOnSpan(input)
+    checkTodo(todo)
+  })
+}
+
+function replaceOnSpan(target) {
+  target.insertAdjacentHTML('afterend', 
+    `<span>${target.value}</span>`
+  )
+  target.remove()
+}
